@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#fff8ed">
-  <meta name="description" content="Des jeux amusants pour apprendre les additions et les soustractions en CP.">
+  <meta name="description" content="Des jeux amusants pour apprendre les additions, les soustractions et à comparer les nombres en CP.">
   <title>Les additions — Maths CP</title>
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
@@ -31,6 +31,9 @@
       </button>
       <button class="lesson-button" type="button" data-operation="subtraction" aria-pressed="false">
         <span aria-hidden="true">➖</span> Soustractions
+      </button>
+      <button class="lesson-button" type="button" data-operation="comparison" aria-pressed="false">
+        <span aria-hidden="true">⚖️</span> Comparer
       </button>
     </nav>
 
@@ -67,9 +70,14 @@
       <div class="exercise" id="exercise">
         <div class="sum" id="sum" aria-label="Addition à résoudre">
           <span class="number" id="first-number">2</span>
+          <div class="comparison-options" id="comparison-options" role="group" aria-label="Choisis le signe qui convient" hidden>
+            <button class="comparison-button" type="button" data-sign="<" aria-label="Est inférieur à">&lt;</button>
+            <button class="comparison-button" type="button" data-sign="=" aria-label="Est égal à">=</button>
+            <button class="comparison-button" type="button" data-sign=">" aria-label="Est supérieur à">&gt;</button>
+          </div>
           <span class="operator" aria-hidden="true">+</span>
           <span class="number" id="second-number">3</span>
-          <span class="operator equals" aria-hidden="true">=</span>
+          <span class="operator equals" id="arithmetic-equals" aria-hidden="true">=</span>
           <label class="sr-only" for="answer">Ta réponse</label>
           <input
             id="answer"
