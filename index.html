@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fff8ed">
+  <meta name="description" content="Des jeux amusants pour apprendre les additions et les soustractions en CP.">
+  <title>Les additions — Maths CP</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#" aria-label="Maths CP, accueil">
+      <span class="brand-icon" aria-hidden="true">✦</span>
+      <span>Mes maths <span class="brand-grade">CP</span></span>
+    </a>
+    <span class="header-note">J’apprends en m’amusant !</span>
+  </header>
+
+  <main>
+    <section class="intro" aria-labelledby="page-title">
+      <p class="eyebrow"><span aria-hidden="true">🧮</span> Mes leçons de maths</p>
+      <h1 id="page-title">Les additions</h1>
+      <p class="intro-copy">Additionner, c’est réunir des nombres. À toi de jouer !</p>
+    </section>
+
+    <nav class="lesson-picker" aria-label="Choisir une leçon">
+      <button class="lesson-button is-active" type="button" data-operation="addition" aria-pressed="true">
+        <span aria-hidden="true">➕</span> Additions
+      </button>
+      <button class="lesson-button" type="button" data-operation="subtraction" aria-pressed="false">
+        <span aria-hidden="true">➖</span> Soustractions
+      </button>
+    </nav>
+
+    <section class="game-card" aria-labelledby="exercise-title">
+      <div class="game-top">
+        <div>
+          <p class="section-label">À toi de jouer</p>
+          <h2 id="exercise-title">Résous l’addition</h2>
+        </div>
+        <div class="score-pill" aria-label="Score">
+          <span aria-hidden="true">⭐</span>
+          <span id="score">0</span>
+        </div>
+      </div>
+
+      <div class="progress-area">
+        <div class="progress-label">
+          <span id="question-count">Question 1 sur 10</span>
+          <span id="progress-percent">0 %</span>
+        </div>
+        <div
+          class="progress-track"
+          id="progress-track"
+          role="progressbar"
+          aria-label="Progression des exercices"
+          aria-valuemin="0"
+          aria-valuemax="10"
+          aria-valuenow="0"
+        >
+          <span class="progress-fill" id="progress-fill"></span>
+        </div>
+      </div>
+
+      <div class="exercise" id="exercise">
+        <div class="sum" id="sum" aria-label="Addition à résoudre">
+          <span class="number" id="first-number">2</span>
+          <span class="operator" aria-hidden="true">+</span>
+          <span class="number" id="second-number">3</span>
+          <span class="operator equals" aria-hidden="true">=</span>
+          <label class="sr-only" for="answer">Ta réponse</label>
+          <input
+            id="answer"
+            class="answer-input"
+            type="number"
+            inputmode="numeric"
+            min="0"
+            max="10"
+            placeholder="?"
+            autocomplete="off"
+            aria-describedby="feedback"
+          >
+        </div>
+        <p class="feedback" id="feedback" aria-live="polite">Compte dans ta tête ou sur tes doigts !</p>
+        <button class="button button-primary" id="check-button" type="button">Vérifier ma réponse</button>
+      </div>
+
+      <div class="result-panel" id="result-panel" hidden>
+        <div class="result-emoji" id="result-emoji" aria-hidden="true">🎉</div>
+        <h2 id="result-title">Bravo !</h2>
+        <p id="result-message"></p>
+        <button class="button button-primary" id="restart-button" type="button">Recommencer</button>
+      </div>
+    </section>
+
+    <aside class="tip-card">
+      <span class="tip-icon" aria-hidden="true">💡</span>
+      <p id="tip-text"><strong>Mon astuce :</strong> commence par le plus grand nombre, puis compte sur tes doigts.</p>
+    </aside>
+  </main>
+
+  <footer class="site-footer">
+    <span>Un petit pas chaque jour, et les maths deviennent faciles !</span>
+  </footer>
+</body>
+</html>
