@@ -422,31 +422,31 @@ comparisonButtons.forEach((button) => {
       option.classList.toggle("is-selected", isSelected);
       option.setAttribute("aria-pressed", String(isSelected));
     });
-    undoSyllableButton.addEventListener("click", () => {
-      selectedSyllables.pop();
-      renderSyllables();
-      (syllableOptions.querySelector("button") || checkButton).focus();
-    });
-    listenInstructionButton.addEventListener("click", async () => {
-      try {
-        window.speechSynthesis?.cancel();
-        instructionAudio.currentTime = 0;
-        await instructionAudio.play();
-        feedbackElement.textContent = "Écoute la consigne, puis remets les syllabes dans le bon ordre.";
-        feedbackElement.className = "feedback";
-      } catch (error) {
-        feedbackElement.textContent = "Le son de la consigne n’a pas pu être lu. Vérifie le son de ton appareil.";
-        feedbackElement.className = "feedback is-wrong";
-      }
-    });
-    clearSyllablesButton.addEventListener("click", () => {
-      selectedSyllables = [];
-      renderSyllables();
-      (syllableOptions.querySelector("button") || checkButton).focus();
-    });
     feedbackElement.textContent = "Signe choisi ! Vérifie ta réponse.";
     feedbackElement.className = "feedback";
   });
+});
+undoSyllableButton.addEventListener("click", () => {
+  selectedSyllables.pop();
+  renderSyllables();
+  (syllableOptions.querySelector("button") || checkButton).focus();
+});
+listenInstructionButton.addEventListener("click", async () => {
+  try {
+    window.speechSynthesis?.cancel();
+    instructionAudio.currentTime = 0;
+    await instructionAudio.play();
+    feedbackElement.textContent = "Écoute la consigne, puis remets les syllabes dans le bon ordre.";
+    feedbackElement.className = "feedback";
+  } catch (error) {
+    feedbackElement.textContent = "Le son de la consigne n’a pas pu être lu. Vérifie le son de ton appareil.";
+    feedbackElement.className = "feedback is-wrong";
+  }
+});
+clearSyllablesButton.addEventListener("click", () => {
+  selectedSyllables = [];
+  renderSyllables();
+  (syllableOptions.querySelector("button") || checkButton).focus();
 });
 lessonButtons.forEach((button) => {
   button.addEventListener("click", () => selectOperation(button.dataset.operation));
