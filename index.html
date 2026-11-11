@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#fff8ed">
-  <meta name="description" content="Des jeux amusants pour apprendre les additions, les soustractions et à comparer les nombres en CP.">
+  <meta name="description" content="Des exercices interactifs de maths et de lecture pour les élèves de CP.">
   <title>Les additions — Maths CP</title>
   <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
@@ -20,12 +20,12 @@
 
   <main>
     <section class="intro" aria-labelledby="page-title">
-      <p class="eyebrow"><span aria-hidden="true">🧮</span> Mes leçons de maths</p>
+      <p class="eyebrow"><span aria-hidden="true">📚</span> Mes exercices de CP</p>
       <h1 id="page-title">Les additions</h1>
       <p class="intro-copy">Additionner, c’est réunir des nombres. À toi de jouer !</p>
     </section>
 
-    <nav class="lesson-picker" aria-label="Choisir une leçon">
+    <nav class="lesson-picker" aria-label="Choisir un exercice">
       <button class="lesson-button is-active" type="button" data-operation="addition" aria-pressed="true">
         <span aria-hidden="true">➕</span> Additions
       </button>
@@ -34,6 +34,9 @@
       </button>
       <button class="lesson-button" type="button" data-operation="comparison" aria-pressed="false">
         <span aria-hidden="true">⚖️</span> Comparer
+      </button>
+      <button class="lesson-button" type="button" data-operation="syllables" aria-pressed="false">
+        <span aria-hidden="true">📖</span> Lecture
       </button>
     </nav>
 
@@ -68,6 +71,21 @@
       </div>
 
       <div class="exercise" id="exercise">
+        <div class="syllable-game" id="syllable-game" hidden>
+          <p class="syllable-level" id="syllable-level"></p>
+          <p class="syllable-instruction">Choisis les syllabes dans l’ordre pour lire le mot.</p>
+          <button class="button button-secondary sound-button" id="listen-instruction-button" type="button">
+            <span aria-hidden="true">🔊</span> Écouter la consigne
+          </button>
+          <p class="syllable-label">Mon mot</p>
+          <div class="syllable-answer" id="syllable-answer" role="group" aria-label="Mot en construction"></div>
+          <p class="syllable-label">Les syllabes mélangées</p>
+          <div class="syllable-options" id="syllable-options" role="group" aria-label="Choisir une syllabe"></div>
+          <div class="syllable-actions">
+            <button class="button button-secondary" id="undo-syllable-button" type="button" disabled>Annuler la dernière</button>
+            <button class="button button-secondary" id="clear-syllables-button" type="button" disabled>Tout effacer</button>
+          </div>
+        </div>
         <div class="sum" id="sum" aria-label="Addition à résoudre">
           <span class="number" id="first-number">2</span>
           <div class="comparison-options" id="comparison-options" role="group" aria-label="Choisis le signe qui convient" hidden>

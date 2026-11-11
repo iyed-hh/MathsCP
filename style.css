@@ -197,6 +197,134 @@ h1 {
   box-shadow: 0 18px 55px rgba(76, 57, 134, 0.1), 0 3px 10px rgba(76, 57, 134, 0.04);
 }
 
+.syllable-game {
+  padding-top: 24px;
+}
+
+.syllable-instruction {
+  margin-bottom: 16px;
+  color: var(--muted);
+  font-size: 0.96rem;
+  font-weight: 600;
+}
+
+.syllable-level {
+  width: fit-content;
+  margin: 0 auto 13px;
+  padding: 7px 12px;
+  border: 1px solid #eee8ff;
+  border-radius: 999px;
+  color: var(--purple-dark);
+  background: #f6f2ff;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.sound-button {
+  margin-bottom: 24px;
+}
+
+.sound-button span {
+  margin-right: 4px;
+}
+
+.syllable-label {
+  margin: 0 0 9px;
+  color: var(--muted);
+  font-size: 0.73rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.syllable-answer,
+.syllable-options {
+  min-height: 76px;
+  padding: 11px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border-radius: 18px;
+}
+
+.syllable-answer {
+  margin-bottom: 22px;
+  border: 2px dashed #d7ceec;
+  background: #faf8ff;
+}
+
+.syllable-options {
+  margin-bottom: 14px;
+}
+
+.syllable-placeholder {
+  color: #a4a9b5;
+  font-size: 0.9rem;
+}
+
+.syllable-tile {
+  min-width: 62px;
+  min-height: 54px;
+  padding: 9px 16px;
+  border: 1px solid #e8e2f5;
+  border-radius: 15px;
+  color: var(--ink);
+  background: #fff;
+  box-shadow: 0 3px 8px rgba(76, 57, 134, 0.07);
+  cursor: pointer;
+  font-family: "Nunito", sans-serif;
+  font-size: 1.35rem;
+  font-weight: 900;
+  transition: transform 150ms ease, border-color 150ms ease, background 150ms ease;
+}
+
+.syllable-tile:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: #b7a9e5;
+}
+
+.syllable-tile-selected {
+  border-color: #c9c0e8;
+  color: var(--purple-dark);
+  background: #f0ebff;
+}
+
+.syllable-tile:disabled {
+  cursor: default;
+}
+
+.syllable-tile:focus-visible,
+.button-secondary:focus-visible {
+  outline: 3px solid #ad9af1;
+  outline-offset: 3px;
+}
+
+.syllable-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.button-secondary {
+  min-height: 42px;
+  padding: 9px 14px;
+  color: var(--purple-dark);
+  background: #f4f0ff;
+  font-size: 0.82rem;
+}
+
+.button-secondary:hover:not(:disabled) {
+  background: #eae3ff;
+}
+
+.button-secondary:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
 .game-top {
   display: flex;
   align-items: center;

@@ -7,6 +7,13 @@ const arithmeticEquals = document.querySelector("#arithmetic-equals");
 const sumElement = document.querySelector("#sum");
 const comparisonOptions = document.querySelector("#comparison-options");
 const comparisonButtons = document.querySelectorAll(".comparison-button");
+const syllableGame = document.querySelector("#syllable-game");
+const syllableAnswer = document.querySelector("#syllable-answer");
+const syllableOptions = document.querySelector("#syllable-options");
+const undoSyllableButton = document.querySelector("#undo-syllable-button");
+const clearSyllablesButton = document.querySelector("#clear-syllables-button");
+const syllableLevel = document.querySelector("#syllable-level");
+const listenInstructionButton = document.querySelector("#listen-instruction-button");
 const pageTitle = document.querySelector("#page-title");
 const introCopy = document.querySelector(".intro-copy");
 const exerciseTitle = document.querySelector("#exercise-title");
@@ -26,6 +33,7 @@ const resultEmoji = document.querySelector("#result-emoji");
 const resultTitle = document.querySelector("#result-title");
 const resultMessage = document.querySelector("#result-message");
 const lessonButtons = document.querySelectorAll(".lesson-button");
+const syllableInstruction = "Choisis les syllabes dans l’ordre pour lire le mot.";
 
 let firstNumber = 0;
 let secondNumber = 0;
@@ -34,9 +42,148 @@ let score = 0;
 let answered = false;
 let operation = "addition";
 let selectedComparison = "";
+let wordDeck = [];
+let currentWord = null;
+let shuffledSyllables = [];
+let selectedSyllables = [];
+
+const readingWords = [
+  { word: "papa", syllables: ["pa", "pa"] },
+  { word: "vélo", syllables: ["vé", "lo"] },
+  { word: "moto", syllables: ["mo", "to"] },
+  { word: "tapis", syllables: ["ta", "pis"] },
+  { word: "salade", syllables: ["sa", "la", "de"] },
+  { word: "tomate", syllables: ["to", "ma", "te"] },
+  { word: "cabane", syllables: ["ca", "ba", "ne"] },
+  { word: "banane", syllables: ["ba", "na", "ne"] },
+  { word: "domino", syllables: ["do", "mi", "no"] },
+  { word: "lavabo", syllables: ["la", "va", "bo"] },
+];
+
+function shuffleReadingWords() {
+  const simpleWords = readingWords.filter((item) => item.syllables.length === 2);
+  const longerWords = readingWords.filter((item) => item.syllables.length === 3);
+  return [...shuffle(simpleWords), ...shuffle(longerWords)];
+}
+
+function speak(text, { onUnavailable } = {}) {
+  if (!("speechSynthesis" in window) || !("SpeechSynthesisUtterance" in window)) {
+    if (onUnavailable) {
+      onUnavailable();
+    }
+    return false;
+  }
+
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "fr-FR";
+  utterance.rate = 0.8;
+  const frenchVoice = window.speechSynthesis.getVoices()
+    .find((voice) => voice.lang.toLowerCase().startsWith("fr"));
+  if (frenchVoice) {
+    utterance.voice = frenchVoice;
+  }
+  utterance.onerror = (event) => {
+    if (event.error !== "canceled" && event.error !== "interrupted") {
+      feedbackElement.textContent = "Le son n’a pas pu être lu. Vérifie le son de ton appareil.";
+      feedbackElement.className = "feedback is-wrong";
+    }
+  };
+  window.speechSynthesis.speak(utterance);
+  return true;
+}
+
+function shuffle(items) {
+  const shuffled = [...items];
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]];
+  }
+  return shuffled;
+}
+
+function createSyllableQuestion() {
+  currentWord = wordDeck[questionNumber - 1];
+  syllableLevel.textContent = currentWord.syllables.length === 2
+    ? "Niveau CP · Je découvre les syllabes"
+    : "Niveau CP · Je progresse avec 3 syllabes";
+  selectedSyllables = [];
+  shuffledSyllables = shuffle(currentWord.syllables.map((text, index) => ({ text, index })));
+  if (
+    shuffledSyllables.length > 1
+    && shuffledSyllables.every((syllable, index) => syllable.index === index)
+  ) {
+    shuffledSyllables.push(shuffledSyllables.shift());
+  }
+  renderSyllables();
+}
+
+function renderSyllables() {
+  syllableAnswer.replaceChildren();
+  syllableOptions.replaceChildren();
+
+  if (selectedSyllables.length === 0) {
+    const placeholder = document.createElement("span");
+    placeholder.className = "syllable-placeholder";
+    placeholder.textContent = "Choisis la première syllabe";
+    syllableAnswer.append(placeholder);
+  }
+
+  selectedSyllables.forEach((syllableIndex) => {
+    const syllable = shuffledSyllables.find((item) => item.index === syllableIndex);
+    const button = document.createElement("button");
+    button.className = "syllable-tile syllable-tile-selected";
+    button.type = "button";
+    button.textContent = syllable.text;
+    button.setAttribute("aria-label", `Retirer la syllabe ${syllable.text}`);
+    button.disabled = answered;
+    button.addEventListener("click", () => {
+      selectedSyllables = selectedSyllables.filter((index) => index !== syllableIndex);
+      renderSyllables();
+      (syllableOptions.querySelector("button") || checkButton).focus();
+    });
+    syllableAnswer.append(button);
+  });
+
+  shuffledSyllables.forEach((syllable) => {
+    if (selectedSyllables.includes(syllable.index)) {
+      return;
+    }
+
+    const button = document.createElement("button");
+    button.className = "syllable-tile";
+    button.type = "button";
+    button.textContent = syllable.text;
+    button.setAttribute("aria-label", `Choisir la syllabe ${syllable.text}`);
+    button.disabled = answered;
+    button.addEventListener("click", () => {
+      speak(syllable.text, {
+        onUnavailable: () => {
+          feedbackElement.textContent = "La lecture audio n’est pas disponible sur ce navigateur.";
+          feedbackElement.className = "feedback is-wrong";
+        },
+      });
+      selectedSyllables.push(syllable.index);
+      renderSyllables();
+      const nextOption = syllableOptions.querySelector("button");
+      (nextOption || checkButton).focus();
+    });
+    syllableOptions.append(button);
+  });
+
+  undoSyllableButton.disabled = answered || selectedSyllables.length === 0;
+  clearSyllablesButton.disabled = answered || selectedSyllables.length === 0;
+}
 
 function createQuestion() {
-  if (operation === "addition") {
+  answered = false;
+  const isSyllableLesson = operation === "syllables";
+  sumElement.hidden = isSyllableLesson;
+  syllableGame.hidden = !isSyllableLesson;
+
+  if (isSyllableLesson) {
+    createSyllableQuestion();
+  } else if (operation === "addition") {
     firstNumber = Math.floor(Math.random() * 6);
     secondNumber = Math.floor(Math.random() * (11 - firstNumber));
   } else if (operation === "subtraction") {
@@ -76,11 +223,14 @@ function createQuestion() {
   });
   checkButton.textContent = "Vérifier ma réponse";
   checkButton.disabled = false;
-  feedbackElement.textContent = "Compte dans ta tête ou sur tes doigts !";
+  feedbackElement.textContent = isSyllableLesson
+    ? "Lis chaque syllabe, puis assemble-les."
+    : "Compte dans ta tête ou sur tes doigts !";
   feedbackElement.className = "feedback";
-  answered = false;
   updateProgress();
-  if (operation === "comparison") {
+  if (isSyllableLesson) {
+    syllableOptions.querySelector("button")?.focus();
+  } else if (operation === "comparison") {
     comparisonButtons[0].focus();
   } else {
     answerInput.focus();
@@ -110,7 +260,17 @@ function checkAnswer() {
   }
 
   let answer;
-  if (operation === "comparison") {
+  if (operation === "syllables") {
+    if (selectedSyllables.length !== currentWord.syllables.length) {
+      feedbackElement.textContent = "Choisis toutes les syllabes pour former le mot.";
+      feedbackElement.className = "feedback is-wrong";
+      syllableOptions.querySelector("button")?.focus();
+      return;
+    }
+    answer = selectedSyllables
+      .map((index) => shuffledSyllables.find((syllable) => syllable.index === index).text)
+      .join("");
+  } else if (operation === "comparison") {
     if (!selectedComparison) {
       feedbackElement.textContent = "Choisis un signe avant de vérifier.";
       feedbackElement.className = "feedback is-wrong";
@@ -139,23 +299,36 @@ function checkAnswer() {
 
   answered = true;
   answerInput.disabled = true;
+  renderSyllables();
   comparisonButtons.forEach((button) => {
     button.disabled = true;
   });
   checkButton.textContent = questionNumber === TOTAL_QUESTIONS ? "Voir mon résultat" : "Question suivante";
 
-  const correctAnswer = operation === "comparison"
-    ? firstNumber < secondNumber ? "<" : firstNumber > secondNumber ? ">" : "="
-    : operation === "addition" ? firstNumber + secondNumber : firstNumber - secondNumber;
+  const correctAnswer = operation === "syllables"
+    ? currentWord.word
+    : operation === "comparison"
+      ? firstNumber < secondNumber ? "<" : firstNumber > secondNumber ? ">" : "="
+      : operation === "addition" ? firstNumber + secondNumber : firstNumber - secondNumber;
 
-  if (operation === "comparison" ? answer === correctAnswer : Number(answer) === correctAnswer) {
+  if (operation === "syllables" ? answer === correctAnswer
+    : operation === "comparison" ? answer === correctAnswer : Number(answer) === correctAnswer) {
     score += 1;
     feedbackElement.textContent = "Bravo, c’est la bonne réponse ! 🎉";
     feedbackElement.className = "feedback is-correct";
+    if (operation === "syllables") {
+      speak(currentWord.word, {
+        onUnavailable: () => {
+          feedbackElement.textContent = "Bravo, c’est la bonne réponse ! La lecture audio n’est pas disponible sur ce navigateur.";
+        },
+      });
+    }
   } else {
-    feedbackElement.textContent = operation === "comparison"
-      ? `Pas tout à fait : le bon signe était « ${correctAnswer} ».`
-      : `Pas tout à fait : la réponse était ${correctAnswer}.`;
+    feedbackElement.textContent = operation === "syllables"
+      ? `Pas tout à fait : les syllabes forment « ${correctAnswer} ».`
+      : operation === "comparison"
+        ? `Pas tout à fait : le bon signe était « ${correctAnswer} ».`
+        : `Pas tout à fait : la réponse était ${correctAnswer}.`;
     feedbackElement.className = "feedback is-wrong";
   }
 
@@ -195,22 +368,30 @@ function selectOperation(nextOperation) {
   const isAddition = operation === "addition";
   const isSubtraction = operation === "subtraction";
   const isComparison = operation === "comparison";
-  const lesson = isAddition ? "Les additions" : isSubtraction ? "Les soustractions" : "Comparer les nombres";
+  const isSyllableLesson = operation === "syllables";
+  const lesson = isAddition ? "Les additions"
+    : isSubtraction ? "Les soustractions"
+      : isComparison ? "Comparer les nombres" : "Lecture : les syllabes";
   pageTitle.textContent = lesson;
   introCopy.textContent = isAddition
     ? "Additionner, c’est réunir des nombres. À toi de jouer !"
     : isSubtraction
       ? "Soustraire, c’est enlever une quantité. À toi de jouer !"
-      : "Choisis le signe >, < ou = pour comparer les nombres.";
+      : isComparison
+        ? "Choisis le signe >, < ou = pour comparer les nombres."
+        : "Remets les syllabes dans l’ordre pour lire un mot.";
   exerciseTitle.textContent = isAddition
     ? "Résous l’addition"
-    : isSubtraction ? "Résous la soustraction" : "Compare les nombres";
+    : isSubtraction ? "Résous la soustraction"
+      : isComparison ? "Compare les nombres" : "Lis le mot";
   operatorElement.textContent = isAddition ? "+" : "−";
   tipText.innerHTML = isAddition
     ? "<strong>Mon astuce :</strong> commence par le plus grand nombre, puis compte sur tes doigts."
     : isSubtraction
       ? "<strong>Mon astuce :</strong> commence par le premier nombre, puis enlève le second en comptant à rebours."
-      : "<strong>Mon astuce :</strong> le signe s’ouvre toujours vers le plus grand nombre.";
+      : isComparison
+        ? "<strong>Mon astuce :</strong> le signe s’ouvre toujours vers le plus grand nombre."
+        : "<strong>Mon astuce :</strong> lis chaque syllabe séparément, puis colle-les pour lire le mot.";
   document.title = `${lesson} — Maths CP`;
   lessonButtons.forEach((button) => {
     const isSelected = button.dataset.operation === operation;
@@ -223,6 +404,9 @@ function selectOperation(nextOperation) {
 function restartGame() {
   questionNumber = 1;
   score = 0;
+  if (operation === "syllables") {
+    wordDeck = shuffleReadingWords();
+  }
   exercise.hidden = false;
   resultPanel.hidden = true;
   createQuestion();
@@ -238,6 +422,24 @@ comparisonButtons.forEach((button) => {
       option.classList.toggle("is-selected", isSelected);
       option.setAttribute("aria-pressed", String(isSelected));
     });
+    undoSyllableButton.addEventListener("click", () => {
+      selectedSyllables.pop();
+      renderSyllables();
+      (syllableOptions.querySelector("button") || checkButton).focus();
+    });
+    listenInstructionButton.addEventListener("click", () => {
+      speak(syllableInstruction, {
+        onUnavailable: () => {
+          feedbackElement.textContent = "La lecture audio n’est pas disponible sur ce navigateur.";
+          feedbackElement.className = "feedback is-wrong";
+        },
+      });
+    });
+    clearSyllablesButton.addEventListener("click", () => {
+      selectedSyllables = [];
+      renderSyllables();
+      (syllableOptions.querySelector("button") || checkButton).focus();
+    });
     feedbackElement.textContent = "Signe choisi ! Vérifie ta réponse.";
     feedbackElement.className = "feedback";
   });
@@ -251,4 +453,5 @@ answerInput.addEventListener("keydown", (event) => {
   }
 });
 
+wordDeck = shuffleReadingWords();
 createQuestion();
