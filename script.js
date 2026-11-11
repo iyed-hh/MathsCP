@@ -14,6 +14,7 @@ const undoSyllableButton = document.querySelector("#undo-syllable-button");
 const clearSyllablesButton = document.querySelector("#clear-syllables-button");
 const syllableLevel = document.querySelector("#syllable-level");
 const listenInstructionButton = document.querySelector("#listen-instruction-button");
+const instructionAudio = document.querySelector("#instruction-audio");
 const pageTitle = document.querySelector("#page-title");
 const introCopy = document.querySelector(".intro-copy");
 const exerciseTitle = document.querySelector("#exercise-title");
@@ -33,7 +34,6 @@ const resultEmoji = document.querySelector("#result-emoji");
 const resultTitle = document.querySelector("#result-title");
 const resultMessage = document.querySelector("#result-message");
 const lessonButtons = document.querySelectorAll(".lesson-button");
-const syllableInstruction = "Choisis les syllabes dans l’ordre pour lire le mot.";
 
 let firstNumber = 0;
 let secondNumber = 0;
@@ -427,13 +427,17 @@ comparisonButtons.forEach((button) => {
       renderSyllables();
       (syllableOptions.querySelector("button") || checkButton).focus();
     });
-    listenInstructionButton.addEventListener("click", () => {
-      speak(syllableInstruction, {
-        onUnavailable: () => {
-          feedbackElement.textContent = "La lecture audio n’est pas disponible sur ce navigateur.";
-          feedbackElement.className = "feedback is-wrong";
-        },
-      });
+    listenInstructionButton.addEventListener("click", async () => {
+      try {
+        window.speechSynthesis?.cancel();
+        instructionAudio.currentTime = 0;
+        await instructionAudio.play();
+        feedbackElement.textContent = "Écoute la consigne, puis remets les syllabes dans le bon ordre.";
+        feedbackElement.className = "feedback";
+      } catch (error) {
+        feedbackElement.textContent = "Le son de la consigne n’a pas pu être lu. Vérifie le son de ton appareil.";
+        feedbackElement.className = "feedback is-wrong";
+      }
     });
     clearSyllablesButton.addEventListener("click", () => {
       selectedSyllables = [];

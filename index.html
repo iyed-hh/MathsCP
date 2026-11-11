@@ -73,10 +73,11 @@
       <div class="exercise" id="exercise">
         <div class="syllable-game" id="syllable-game" hidden>
           <p class="syllable-level" id="syllable-level"></p>
-          <p class="syllable-instruction">Choisis les syllabes dans l’ordre pour lire le mot.</p>
+          <p class="syllable-instruction">Choisis les syllabes dans le bon ordre pour lire le mot.</p>
           <button class="button button-secondary sound-button" id="listen-instruction-button" type="button">
             <span aria-hidden="true">🔊</span> Écouter la consigne
           </button>
+          <audio id="instruction-audio" preload="metadata" src="sounds/consigne-syllabes.wav"></audio>
           <p class="syllable-label">Mon mot</p>
           <div class="syllable-answer" id="syllable-answer" role="group" aria-label="Mot en construction"></div>
           <p class="syllable-label">Les syllabes mélangées</p>
