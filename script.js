@@ -1,4 +1,5 @@
-const TOTAL_QUESTIONS = 10;
+const TOTAL_QUESTIONS = 20;
+const MAX_NUMBER = 20;
 
 const firstNumberElement = document.querySelector("#first-number");
 const secondNumberElement = document.querySelector("#second-number");
@@ -184,21 +185,21 @@ function createQuestion() {
   if (isSyllableLesson) {
     createSyllableQuestion();
   } else if (operation === "addition") {
-    firstNumber = Math.floor(Math.random() * 6);
-    secondNumber = Math.floor(Math.random() * (11 - firstNumber));
+    firstNumber = Math.floor(Math.random() * (MAX_NUMBER + 1));
+    secondNumber = Math.floor(Math.random() * (MAX_NUMBER + 1 - firstNumber));
   } else if (operation === "subtraction") {
-    firstNumber = Math.floor(Math.random() * 11);
+    firstNumber = Math.floor(Math.random() * (MAX_NUMBER + 1));
     secondNumber = Math.floor(Math.random() * (firstNumber + 1));
   } else {
     const comparison = ["<", "=", ">"][Math.floor(Math.random() * 3)];
     if (comparison === "<") {
-      firstNumber = Math.floor(Math.random() * 10);
-      secondNumber = firstNumber + 1 + Math.floor(Math.random() * (10 - firstNumber));
+      firstNumber = Math.floor(Math.random() * MAX_NUMBER);
+      secondNumber = firstNumber + 1 + Math.floor(Math.random() * (MAX_NUMBER - firstNumber));
     } else if (comparison === ">") {
-      firstNumber = 1 + Math.floor(Math.random() * 10);
+      firstNumber = 1 + Math.floor(Math.random() * MAX_NUMBER);
       secondNumber = Math.floor(Math.random() * firstNumber);
     } else {
-      firstNumber = Math.floor(Math.random() * 11);
+      firstNumber = Math.floor(Math.random() * (MAX_NUMBER + 1));
       secondNumber = firstNumber;
     }
   }
@@ -288,8 +289,8 @@ function checkAnswer() {
       return;
     }
 
-    if (!answerInput.validity.valid || Number(answer) < 0 || Number(answer) > 10) {
-      feedbackElement.textContent = "Choisis un nombre entre 0 et 10.";
+    if (!answerInput.validity.valid || Number(answer) < 0 || Number(answer) > MAX_NUMBER) {
+      feedbackElement.textContent = `Choisis un nombre entre 0 et ${MAX_NUMBER}.`;
       feedbackElement.className = "feedback is-wrong";
       answerInput.setAttribute("aria-invalid", "true");
       answerInput.focus();
@@ -374,11 +375,11 @@ function selectOperation(nextOperation) {
       : isComparison ? "Comparer les nombres" : "Lecture : les syllabes";
   pageTitle.textContent = lesson;
   introCopy.textContent = isAddition
-    ? "Additionner, c’est réunir des nombres. À toi de jouer !"
+    ? "Additionne des nombres jusqu’à 20. À toi de jouer !"
     : isSubtraction
-      ? "Soustraire, c’est enlever une quantité. À toi de jouer !"
+      ? "Soustrais des nombres jusqu’à 20. À toi de jouer !"
       : isComparison
-        ? "Choisis le signe >, < ou = pour comparer les nombres."
+        ? "Compare les nombres jusqu’à 20 avec les signes >, < ou =."
         : "Remets les syllabes dans l’ordre pour lire un mot.";
   exerciseTitle.textContent = isAddition
     ? "Résous l’addition"
