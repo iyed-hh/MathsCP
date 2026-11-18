@@ -7,7 +7,7 @@
   <meta name="description" content="Des exercices interactifs de maths et de lecture pour les élèves de CP.">
   <title>Les additions — Maths CP</title>
   <link rel="stylesheet" href="style.css">
-  <script src="script.js?v=audio-instruction" defer></script>
+  <script src="script.js?v=levels-and-houses" defer></script>
 </head>
 <body>
   <header class="site-header">
@@ -22,7 +22,7 @@
     <section class="intro" aria-labelledby="page-title">
       <p class="eyebrow"><span aria-hidden="true">📚</span> Mes exercices de CP</p>
       <h1 id="page-title">Les additions</h1>
-      <p class="intro-copy">Additionner, c’est réunir des nombres. À toi de jouer !</p>
+      <p class="intro-copy">Additionne des nombres jusqu’à 10. À toi de jouer !</p>
     </section>
 
     <nav class="lesson-picker" aria-label="Choisir un exercice">
@@ -35,10 +35,18 @@
       <button class="lesson-button" type="button" data-operation="comparison" aria-pressed="false">
         <span aria-hidden="true">⚖️</span> Comparer
       </button>
+      <button class="lesson-button" type="button" data-operation="houses" aria-pressed="false">
+        <span aria-hidden="true">🏠</span> Maisons des nombres
+      </button>
       <button class="lesson-button" type="button" data-operation="syllables" aria-pressed="false">
         <span aria-hidden="true">📖</span> Lecture
       </button>
     </nav>
+
+    <div class="range-picker" id="range-picker" role="group" aria-label="Choisir le niveau des nombres">
+      <button class="range-button is-active" type="button" data-range="10" aria-pressed="true">Jusqu’à 10</button>
+      <button class="range-button" type="button" data-range="20" aria-pressed="false">Jusqu’à 20</button>
+    </div>
 
     <section class="game-card" aria-labelledby="exercise-title">
       <div class="game-top">
@@ -71,6 +79,17 @@
       </div>
 
       <div class="exercise" id="exercise">
+        <div class="number-house" id="number-house" hidden>
+          <div class="house-roof">
+            <span class="sr-only">Maison du nombre</span>
+            <strong id="house-target">5</strong>
+          </div>
+          <div class="house-rooms" role="group" aria-label="Les deux nombres de la maison">
+            <span class="house-room" id="house-first-part">2</span>
+            <span class="house-room house-room-missing" id="house-missing-part">?</span>
+          </div>
+          <p class="house-caption">Trouve le nombre qui manque pour compléter la maison.</p>
+        </div>
         <div class="syllable-game" id="syllable-game" hidden>
           <p class="syllable-level" id="syllable-level"></p>
           <p class="syllable-instruction">Choisis les syllabes dans le bon ordre pour lire le mot.</p>

@@ -156,6 +156,39 @@ h1 {
   background: rgba(255, 255, 255, 0.72);
 }
 
+.range-picker {
+  margin: -7px auto 20px;
+  padding: 4px;
+  width: fit-content;
+  display: flex;
+  gap: 4px;
+  border: 1px solid rgba(225, 219, 244, 0.8);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.range-button {
+  min-height: 38px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 10px;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.range-button.is-active {
+  color: var(--purple-dark);
+  background: #f0ebff;
+}
+
+.range-button:focus-visible {
+  outline: 3px solid #ad9af1;
+  outline-offset: 2px;
+}
+
 .lesson-button {
   min-height: 42px;
   padding: 9px 15px;
@@ -387,6 +420,67 @@ h1 {
 .exercise {
   padding-top: 32px;
   text-align: center;
+}
+
+.number-house {
+  width: min(100%, 290px);
+  margin: 0 auto 22px;
+}
+
+.house-roof {
+  width: 150px;
+  height: 72px;
+  margin: 0 auto -1px;
+  padding-top: 36px;
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: var(--coral);
+  font-family: "Nunito", sans-serif;
+  font-size: 1.65rem;
+}
+
+.house-rooms {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  border: 3px solid #e8e2f5;
+  border-radius: 0 0 16px 16px;
+  background: #faf8ff;
+}
+
+.house-room {
+  min-height: 70px;
+  display: grid;
+  place-items: center;
+  color: var(--ink);
+  font-family: "Nunito", sans-serif;
+  font-size: 1.7rem;
+  font-weight: 900;
+}
+
+.house-room + .house-room {
+  border-left: 2px solid #e8e2f5;
+}
+
+.house-room-missing {
+  color: var(--purple-dark);
+  background: #f0ebff;
+}
+
+.house-caption {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.sum.is-house .operator {
+  color: #a4a9b5;
+}
+
+.sum.is-house .equals {
+  color: var(--coral);
 }
 
 .sum {

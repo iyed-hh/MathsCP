@@ -1,11 +1,15 @@
 const TOTAL_QUESTIONS = 20;
-const MAX_NUMBER = 20;
+const DEFAULT_RANGE = 10;
 
 const firstNumberElement = document.querySelector("#first-number");
 const secondNumberElement = document.querySelector("#second-number");
 const operatorElement = document.querySelector(".sum .operator");
 const arithmeticEquals = document.querySelector("#arithmetic-equals");
 const sumElement = document.querySelector("#sum");
+const numberHouse = document.querySelector("#number-house");
+const houseTargetElement = document.querySelector("#house-target");
+const houseFirstPartElement = document.querySelector("#house-first-part");
+const houseMissingPartElement = document.querySelector("#house-missing-part");
 const comparisonOptions = document.querySelector("#comparison-options");
 const comparisonButtons = document.querySelectorAll(".comparison-button");
 const syllableGame = document.querySelector("#syllable-game");
@@ -35,6 +39,8 @@ const resultEmoji = document.querySelector("#result-emoji");
 const resultTitle = document.querySelector("#result-title");
 const resultMessage = document.querySelector("#result-message");
 const lessonButtons = document.querySelectorAll(".lesson-button");
+const rangePicker = document.querySelector("#range-picker");
+const rangeButtons = document.querySelectorAll(".range-button");
 
 let firstNumber = 0;
 let secondNumber = 0;
@@ -42,6 +48,8 @@ let questionNumber = 1;
 let score = 0;
 let answered = false;
 let operation = "addition";
+let numberRange = DEFAULT_RANGE;
+let houseTarget = 0;
 let selectedComparison = "";
 let wordDeck = [];
 let currentWord = null;
@@ -179,37 +187,55 @@ function renderSyllables() {
 function createQuestion() {
   answered = false;
   const isSyllableLesson = operation === "syllables";
+  const isHouseLesson = operation === "houses";
   sumElement.hidden = isSyllableLesson;
+  sumElement.classList.toggle("is-house", isHouseLesson);
+  numberHouse.hidden = !isHouseLesson;
   syllableGame.hidden = !isSyllableLesson;
+  rangePicker.hidden = isSyllableLesson;
 
   if (isSyllableLesson) {
     createSyllableQuestion();
   } else if (operation === "addition") {
-    firstNumber = Math.floor(Math.random() * (MAX_NUMBER + 1));
-    secondNumber = Math.floor(Math.random() * (MAX_NUMBER + 1 - firstNumber));
+    firstNumber = Math.floor(Math.random() * (numberRange + 1));
+    secondNumber = Math.floor(Math.random() * (numberRange + 1 - firstNumber));
   } else if (operation === "subtraction") {
-    firstNumber = Math.floor(Math.random() * (MAX_NUMBER + 1));
+    firstNumber = Math.floor(Math.random() * (numberRange + 1));
     secondNumber = Math.floor(Math.random() * (firstNumber + 1));
+  } else if (isHouseLesson) {
+    houseTarget = 1 + Math.floor(Math.random() * numberRange);
+    firstNumber = houseTarget;
+    secondNumber = Math.floor(Math.random() * (houseTarget + 1));
+    houseTargetElement.textContent = houseTarget;
+    houseFirstPartElement.textContent = secondNumber;
+    houseMissingPartElement.textContent = "?";
   } else {
     const comparison = ["<", "=", ">"][Math.floor(Math.random() * 3)];
     if (comparison === "<") {
-      firstNumber = Math.floor(Math.random() * MAX_NUMBER);
-      secondNumber = firstNumber + 1 + Math.floor(Math.random() * (MAX_NUMBER - firstNumber));
+      firstNumber = Math.floor(Math.random() * numberRange);
+      secondNumber = firstNumber + 1 + Math.floor(Math.random() * (numberRange - firstNumber));
     } else if (comparison === ">") {
-      firstNumber = 1 + Math.floor(Math.random() * MAX_NUMBER);
+      firstNumber = 1 + Math.floor(Math.random() * numberRange);
       secondNumber = Math.floor(Math.random() * firstNumber);
     } else {
-      firstNumber = Math.floor(Math.random() * (MAX_NUMBER + 1));
+      firstNumber = Math.floor(Math.random() * (numberRange + 1));
       secondNumber = firstNumber;
     }
   }
 
   firstNumberElement.textContent = firstNumber;
   secondNumberElement.textContent = secondNumber;
+  if (isHouseLesson) {
+    operatorElement.textContent = "=";
+    arithmeticEquals.textContent = "+";
+  }
   sumElement.setAttribute("aria-label", operation === "comparison"
     ? `Compare ${firstNumber} et ${secondNumber}`
-    : `${operation === "addition" ? "Addition" : "Soustraction"} à résoudre`);
+    : isHouseLesson
+      ? `Trouve le complément de ${secondNumber} pour faire ${houseTarget}`
+      : `${operation === "addition" ? "Addition" : "Soustraction"} à résoudre`);
   answerInput.value = "";
+  answerInput.max = numberRange;
   answerInput.disabled = false;
   answerInput.setAttribute("aria-invalid", "false");
   answerInput.hidden = operation === "comparison";
@@ -226,6 +252,8 @@ function createQuestion() {
   checkButton.disabled = false;
   feedbackElement.textContent = isSyllableLesson
     ? "Lis chaque syllabe, puis assemble-les."
+    : isHouseLesson
+      ? `Complète la maison du ${houseTarget} : ${secondNumber} et quel nombre font ${houseTarget} ?`
     : "Compte dans ta tête ou sur tes doigts !";
   feedbackElement.className = "feedback";
   updateProgress();
@@ -289,8 +317,8 @@ function checkAnswer() {
       return;
     }
 
-    if (!answerInput.validity.valid || Number(answer) < 0 || Number(answer) > MAX_NUMBER) {
-      feedbackElement.textContent = `Choisis un nombre entre 0 et ${MAX_NUMBER}.`;
+    if (!answerInput.validity.valid || Number(answer) < 0 || Number(answer) > numberRange) {
+      feedbackElement.textContent = `Choisis un nombre entre 0 et ${numberRange}.`;
       feedbackElement.className = "feedback is-wrong";
       answerInput.setAttribute("aria-invalid", "true");
       answerInput.focus();
@@ -311,6 +339,9 @@ function checkAnswer() {
     : operation === "comparison"
       ? firstNumber < secondNumber ? "<" : firstNumber > secondNumber ? ">" : "="
       : operation === "addition" ? firstNumber + secondNumber : firstNumber - secondNumber;
+  if (operation === "houses") {
+    houseMissingPartElement.textContent = correctAnswer;
+  }
 
   if (operation === "syllables" ? answer === correctAnswer
     : operation === "comparison" ? answer === correctAnswer : Number(answer) === correctAnswer) {
@@ -360,45 +391,74 @@ function showResults() {
   restartButton.focus();
 }
 
-function selectOperation(nextOperation) {
-  if (operation === nextOperation) {
-    return;
-  }
-
-  operation = nextOperation;
+function updateLessonText() {
   const isAddition = operation === "addition";
   const isSubtraction = operation === "subtraction";
   const isComparison = operation === "comparison";
+  const isHouseLesson = operation === "houses";
   const isSyllableLesson = operation === "syllables";
   const lesson = isAddition ? "Les additions"
     : isSubtraction ? "Les soustractions"
-      : isComparison ? "Comparer les nombres" : "Lecture : les syllabes";
+      : isComparison ? "Comparer les nombres"
+        : isHouseLesson ? "Les maisons des nombres" : "Lecture : les syllabes";
   pageTitle.textContent = lesson;
   introCopy.textContent = isAddition
-    ? "Additionne des nombres jusqu’à 20. À toi de jouer !"
+    ? `Additionne des nombres jusqu’à ${numberRange}. À toi de jouer !`
     : isSubtraction
-      ? "Soustrais des nombres jusqu’à 20. À toi de jouer !"
+      ? `Soustrais des nombres jusqu’à ${numberRange}. À toi de jouer !`
       : isComparison
-        ? "Compare les nombres jusqu’à 20 avec les signes >, < ou =."
-        : "Remets les syllabes dans l’ordre pour lire un mot.";
+        ? `Compare les nombres jusqu’à ${numberRange} avec les signes >, < ou =.`
+        : isHouseLesson
+          ? `Trouve les compléments des nombres jusqu’à ${numberRange}.`
+          : "Remets les syllabes dans l’ordre pour lire un mot.";
   exerciseTitle.textContent = isAddition
     ? "Résous l’addition"
     : isSubtraction ? "Résous la soustraction"
-      : isComparison ? "Compare les nombres" : "Lis le mot";
-  operatorElement.textContent = isAddition ? "+" : "−";
+      : isComparison ? "Compare les nombres"
+        : isHouseLesson ? "Complète la maison des nombres" : "Lis le mot";
+  if (isAddition || isSubtraction || isHouseLesson) {
+    operatorElement.textContent = isAddition ? "+" : isSubtraction ? "−" : "=";
+    arithmeticEquals.textContent = isHouseLesson ? "+" : "=";
+  }
   tipText.innerHTML = isAddition
     ? "<strong>Mon astuce :</strong> commence par le plus grand nombre, puis compte sur tes doigts."
     : isSubtraction
       ? "<strong>Mon astuce :</strong> commence par le premier nombre, puis enlève le second en comptant à rebours."
       : isComparison
         ? "<strong>Mon astuce :</strong> le signe s’ouvre toujours vers le plus grand nombre."
-        : "<strong>Mon astuce :</strong> lis chaque syllabe séparément, puis colle-les pour lire le mot.";
+        : isHouseLesson
+          ? "<strong>Mon astuce :</strong> compte à partir du nombre dans la première pièce jusqu’au nombre sur le toit."
+          : "<strong>Mon astuce :</strong> lis chaque syllabe séparément, puis colle-les pour lire le mot.";
   document.title = `${lesson} — Maths CP`;
+}
+
+function selectOperation(nextOperation) {
+  if (operation === nextOperation) {
+    return;
+  }
+
+  operation = nextOperation;
+  updateLessonText();
   lessonButtons.forEach((button) => {
     const isSelected = button.dataset.operation === operation;
     button.classList.toggle("is-active", isSelected);
     button.setAttribute("aria-pressed", String(isSelected));
   });
+  restartGame();
+}
+
+function selectNumberRange(nextRange) {
+  if (numberRange === nextRange) {
+    return;
+  }
+
+  numberRange = nextRange;
+  rangeButtons.forEach((button) => {
+    const isSelected = Number(button.dataset.range) === numberRange;
+    button.classList.toggle("is-active", isSelected);
+    button.setAttribute("aria-pressed", String(isSelected));
+  });
+  updateLessonText();
   restartGame();
 }
 
@@ -451,6 +511,9 @@ clearSyllablesButton.addEventListener("click", () => {
 });
 lessonButtons.forEach((button) => {
   button.addEventListener("click", () => selectOperation(button.dataset.operation));
+});
+rangeButtons.forEach((button) => {
+  button.addEventListener("click", () => selectNumberRange(Number(button.dataset.range)));
 });
 answerInput.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
